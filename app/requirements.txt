@@ -1,0 +1,14 @@
+# CPU inference for the demo and the API. Pillow stays below 13 for gradio.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.11.0
+torchvision==0.26.0
+transformers==5.20.2
+peft==0.21.2
+accelerate==1.15.0
+huggingface_hub==2.3.0
+numpy==2.5.4
+pillow==12.3.0
+gradio==6.30.0
+fastapi==0.162.0
+uvicorn==0.54.0
+python-multipart==0.0.32
