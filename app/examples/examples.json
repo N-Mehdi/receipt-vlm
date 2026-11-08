@@ -1,0 +1,141 @@
+[
+ {
+  "file": "invoice_classic.jpg",
+  "kind": "invoice",
+  "result": {
+   "invoice_number": "F20240286",
+   "date": "2024-03-25",
+   "seller": {
+    "name": "Klein Charpentier S.A.",
+    "address": "30, rue Roland Bailly, 30976 Fabre",
+    "siret": "31439091598402",
+    "vat_number": "FR47314390915"
+   },
+   "client": {
+    "name": "Mercier Gallet S.A.R.L.",
+    "address": "658, rue Leclercq, 09743 Andreboeuf"
+   },
+   "items": [
+    {
+     "description": "Prestation de conseil premium",
+     "quantity": 3,
+     "unit_price": 155.32,
+     "amount": 465.96
+    },
+    {
+     "description": "Installation réseau premium",
+     "quantity": 10,
+     "unit_price": 760.96,
+     "amount": 7609.6
+    },
+    {
+     "description": "Prestation de conseil",
+     "quantity": 1,
+     "unit_price": 1527.42,
+     "amount": 1527.42
+    },
+    {
+     "description": "Support technique premium",
+     "quantity": 10,
+     "unit_price": 1425.21,
+     "amount": 14252.1
+    },
+    {
+     "description": "Câble HDMI",
+     "quantity": 2,
+     "unit_price": 2359.18,
+     "amount": 4718.36
+    }
+   ],
+   "total_ht": 28573.44,
+   "vat_rate": 5.5,
+   "vat_amount": 1571.54,
+   "total_ttc": 30144.98
+  }
+ },
+ {
+  "file": "invoice_serif.jpg",
+  "kind": "invoice",
+  "result": {
+   "invoice_number": "F20234427",
+   "date": "2023-04-24",
+   "seller": {
+    "name": "Baudry Texier et Fils",
+    "address": "43, chemin Julien, 97419 Sainte Sébastien",
+    "siret": "87014182716586",
+    "vat_number": "FR02870141827"
+   },
+   "client": {
+    "name": "Charlotte Lesage",
+    "address": "7, rue Guilbert, 50604 Evrard"
+   },
+   "items": [
+    {
+     "description": "Clavier sans fil premium",
+     "quantity": 2,
+     "unit_price": 2423.62,
+     "amount": 4847.24
+    },
+    {
+     "description": "Développement web premium",
+     "quantity": 5,
+     "unit_price": 730.43,
+     "amount": 3652.15
+    }
+   ],
+   "total_ht": 8499.39,
+   "vat_rate": 10,
+   "vat_amount": 849.94,
+   "total_ttc": 9349.33
+  }
+ },
+ {
+  "file": "cord_test_0.png",
+  "kind": "cord",
+  "result": {
+   "menu": [
+    {
+     "nm": "-TICKET CP",
+     "num": "901016",
+     "unitprice": "60.000",
+     "cnt": "2",
+     "price": "60.000"
+    }
+   ],
+   "sub_total": {
+    "subtotal_price": "60.000",
+    "discount_price": "-60.000",
+    "tax_price": "5.455"
+   },
+   "total": {
+    "total_price": "60.000",
+    "menuqty_cnt": "2",
+    "creditcardprice": "60.000"
+   }
+  }
+ },
+ {
+  "file": "cord_test_1.png",
+  "kind": "cord",
+  "result": {
+   "menu": [
+    {
+     "nm": "J.STB PROMO",
+     "price": "17500"
+    },
+    {
+     "nm": "Y.B.BAT",
+     "price": "46000"
+    },
+    {
+     "nm": "Y.BASO PROM",
+     "price": "27500"
+    }
+   ],
+   "total": {
+    "total_price": "91000",
+    "cashprice": "91000"
+   }
+  }
+ }
+]

@@ -47,13 +47,14 @@ Training: one epoch on 800 CORD receipts and 1000 invoices, 4-bit NF4 base, fp16
   Scores on real scans, handwriting, multi-page or multi-rate VAT invoices are unknown.
 - "Unseen templates" only changes the layout; the text distribution comes from the same generator.
 - CORD fields that are rare in training (sub-items, `itemsubtotal`, `etc`) are still missed.
-- The demo runs on CPU and takes one to two minutes per document.
+- On CPU the live demo takes one to three minutes per document.
 
 ## Links
 
 - Adapter: [N-Mehdi/qwen3-vl-2b-receipts-lora](https://huggingface.co/N-Mehdi/qwen3-vl-2b-receipts-lora)
 - Invoice dataset: [N-Mehdi/french-invoices-synth](https://huggingface.co/datasets/N-Mehdi/french-invoices-synth)
-- Demo: Gradio app in [app/app.py](app/app.py), ready for a Hugging Face Space.
+- Demo: [N-Mehdi/receipt-vlm](https://huggingface.co/spaces/N-Mehdi/receipt-vlm), results and
+  examples precomputed on a T4. The live Gradio demo in [app/app.py](app/app.py) runs locally.
 
 ## Usage
 
@@ -64,13 +65,13 @@ python scripts/evaluate.py --dataset cord --adapter N-Mehdi/qwen3-vl-2b-receipts
 python scripts/train.py --invoice-source data/invoices --hub-repo <user>/<repo>
 ```
 
-API and demo (CPU, the adapter repo needs `HF_TOKEN` while it is private):
+API and live demo (CPU, the base model and the adapter are downloaded on first use):
 
 ```bash
 docker build -t receipt-vlm-api .
-docker run -p 8000:8000 -e HF_TOKEN receipt-vlm-api
+docker run -p 8000:8000 receipt-vlm-api
 curl -F file=@invoice.jpg "localhost:8000/extract?kind=invoice"   # kind: invoice or cord
-pip install -r app/requirements.txt && python -m app.app             # Gradio demo
+pip install -r app/requirements.txt && pip install -e . && python -m app.app   # Gradio demo
 ```
 
 The Kaggle notebooks in [notebooks/](notebooks/) clone this repo and run the same scripts.

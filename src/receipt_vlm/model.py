@@ -20,8 +20,11 @@ def load_processor(padding_side="left"):
 
 
 def load_model(adapter=None, quantize=False):
-    """fp16 model on the GPU; optionally 4-bit NF4 and with a merged LoRA adapter."""
-    kwargs = {"dtype": torch.float16, "device_map": {"": 0} if torch.cuda.is_available() else None}
+    """fp16 on the GPU, fp32 on CPU (faster there); optionally 4-bit NF4 and a merged adapter."""
+    if torch.cuda.is_available():
+        kwargs = {"dtype": torch.float16, "device_map": {"": 0}}
+    else:
+        kwargs = {"dtype": torch.float32}
     if quantize:
         kwargs["quantization_config"] = BitsAndBytesConfig(
             load_in_4bit=True,

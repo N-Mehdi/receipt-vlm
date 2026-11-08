@@ -6,7 +6,7 @@ from typing import Annotated
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from PIL import Image, UnidentifiedImageError
 
-from app.service import KINDS, extract
+from receipt_vlm.service import KINDS, extract
 
 app = FastAPI(title="receipt-vlm")
 
