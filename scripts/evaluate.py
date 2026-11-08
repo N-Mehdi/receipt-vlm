@@ -7,6 +7,7 @@ from pathlib import Path
 
 import numpy as np
 import torch
+import transformers
 
 from receipt_vlm.data import load_documents
 from receipt_vlm.metrics import score
@@ -97,6 +98,8 @@ def main():
         "split": args.split,
         "adapter": args.adapter,
         "max_new_tokens": args.max_new_tokens,
+        "torch": torch.__version__,
+        "transformers": transformers.__version__,
         "seconds": time.perf_counter() - start,
         "all": summarize(rows),
     }
