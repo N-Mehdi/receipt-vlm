@@ -1,0 +1,29 @@
+<html><head><meta charset="utf-8"><style>
+body { margin: 0; background: #fff; }
+.page { width: 794px; padding: 40px; box-sizing: border-box; font: 13px Arial, sans-serif; color: #222; }
+.top { display: flex; justify-content: space-between; }
+h1 { font-size: 28px; margin: 0 0 8px; color: #333; }
+.client { margin: 30px 0 20px 380px; padding: 10px; border: 1px solid #999; }
+table { width: 100%; border-collapse: collapse; }
+th { background: #eee; text-align: left; padding: 6px; border-bottom: 2px solid #333; }
+td { padding: 6px; border-bottom: 1px solid #ddd; }
+.r { text-align: right; }
+.totals { width: 300px; margin: 20px 0 0 auto; }
+.foot { margin-top: 40px; font-size: 11px; color: #555; border-top: 1px solid #ccc; padding-top: 8px; }
+</style></head><body><div class="page">
+<div class="top">
+  <div><b>{{ inv.seller.name }}</b><br>{% for l in d.seller_lines %}{{ l }}<br>{% endfor %}Tél. {{ d.phone }}</div>
+  <div class="r"><h1>FACTURE</h1>N° {{ inv.invoice_number }}<br>Date : {{ d.date.strftime("%d/%m/%Y") }}</div>
+</div>
+<div class="client"><b>{{ inv.client.name }}</b><br>{% for l in d.client_lines %}{{ l }}<br>{% endfor %}</div>
+<table><tr><th>Désignation</th><th class="r">Qté</th><th class="r">Prix unit. HT</th><th class="r">Total HT</th></tr>
+{% for x in d.lines %}<tr><td>{{ x.description }}</td><td class="r">{{ x.quantity }}</td><td class="r">{{ x.unit|eur }}</td><td class="r">{{ x.amount|eur }}</td></tr>{% endfor %}
+</table>
+<table class="totals">
+<tr><td>Total HT</td><td class="r">{{ d.total_ht|eur }}</td></tr>
+<tr><td>TVA {{ d.rate|num }} %</td><td class="r">{{ d.vat|eur }}</td></tr>
+<tr><td><b>Total TTC</b></td><td class="r"><b>{{ d.total_ttc|eur }}</b></td></tr>
+</table>
+<div class="foot">{{ inv.seller.name }} - SIRET {{ inv.seller.siret }} - TVA intracommunautaire {{ inv.seller.vat_number }}<br>
+Paiement à {{ d.due_days }} jours - IBAN {{ d.iban }}</div>
+</div></body></html>

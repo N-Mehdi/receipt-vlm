@@ -1,0 +1,26 @@
+<html><head><meta charset="utf-8"><style>
+body { margin: 0; background: #fff; }
+.page { width: 720px; padding: 44px; box-sizing: border-box; font: 13px "Trebuchet MS", "DejaVu Sans", sans-serif; color: #444; }
+.head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 36px; }
+.head .t { font-size: 34px; color: #999; font-weight: 300; }
+.meta td { padding: 1px 8px 1px 0; }
+table.items { width: 100%; border-collapse: collapse; margin-top: 28px; }
+.items th { color: #999; font-weight: normal; text-align: left; padding: 6px 0; font-size: 11px; text-transform: uppercase; }
+.items td { padding: 8px 0; border-top: 1px solid #eee; }
+.r { text-align: right; }
+.ttc { font-size: 24px; color: #222; text-align: right; margin-top: 20px; }
+.foot { margin-top: 48px; font-size: 10px; color: #888; }
+</style></head><body><div class="page">
+<div class="head"><div class="t">Facture</div><div class="r">{{ inv.seller.name }}</div></div>
+<table class="meta">
+<tr><td>Facture n°</td><td>{{ inv.invoice_number }}</td></tr>
+<tr><td>Date</td><td>{{ d.date.strftime("%d/%m/%Y") }}</td></tr>
+<tr><td>Client</td><td>{{ inv.client.name }}, {{ inv.client.address }}</td></tr>
+</table>
+<table class="items"><tr><th>Description</th><th class="r">Qté</th><th class="r">Prix unitaire</th><th class="r">Total</th></tr>
+{% for x in d.lines %}<tr><td>{{ x.description }}</td><td class="r">{{ x.quantity }}</td><td class="r">{{ x.unit|eur }}</td><td class="r">{{ x.amount|eur }}</td></tr>{% endfor %}
+</table>
+<p class="r">Total HT {{ d.total_ht|eur }}<br>TVA {{ d.rate|num }} % {{ d.vat|eur }}</p>
+<div class="ttc">Total TTC {{ d.total_ttc|eur }}</div>
+<div class="foot">{{ inv.seller.name }} | {{ inv.seller.address }} | SIRET {{ inv.seller.siret }} | TVA {{ inv.seller.vat_number }} | IBAN {{ d.iban }}</div>
+</div></body></html>

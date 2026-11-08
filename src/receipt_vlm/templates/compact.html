@@ -1,0 +1,29 @@
+<html><head><meta charset="utf-8"><style>
+body { margin: 0; background: #fff; }
+.page { width: 560px; padding: 24px; box-sizing: border-box; font: 12px "Courier New", monospace; color: #111; }
+.c { text-align: center; }
+hr { border: none; border-top: 1px dashed #333; margin: 10px 0; }
+table { width: 100%; border-collapse: collapse; }
+td { padding: 2px 6px 2px 0; vertical-align: top; }
+.r { text-align: right; }
+</style></head><body><div class="page">
+<div class="c"><b>{{ inv.seller.name|upper }}</b><br>{% for l in d.seller_lines %}{{ l }}<br>{% endfor %}
+SIRET {{ inv.seller.siret }}<br>TVA {{ inv.seller.vat_number }}</div>
+<hr>
+FACTURE {{ inv.invoice_number }}<br>
+DATE    {{ d.date.strftime("%d.%m.%Y") }}<br>
+CLIENT  {{ inv.client.name }}<br>
+        {{ inv.client.address }}
+<hr>
+<table><tr><td>QTE</td><td>ARTICLE</td><td class="r">P.U.</td><td class="r">MONTANT</td></tr>
+{% for x in d.lines %}<tr><td>{{ x.quantity }}</td><td>{{ x.description }}</td><td class="r">{{ x.unit|eur }}</td><td class="r">{{ x.amount|eur }}</td></tr>{% endfor %}
+</table>
+<hr>
+<table>
+<tr><td>TOTAL HT</td><td class="r">{{ d.total_ht|eur }}</td></tr>
+<tr><td>TVA {{ d.rate|num }}%</td><td class="r">{{ d.vat|eur }}</td></tr>
+<tr><td><b>TOTAL TTC</b></td><td class="r"><b>{{ d.total_ttc|eur }}</b></td></tr>
+</table>
+<hr>
+<div class="c">Merci de votre confiance</div>
+</div></body></html>

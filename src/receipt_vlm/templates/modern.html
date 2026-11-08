@@ -1,0 +1,35 @@
+<html><head><meta charset="utf-8"><style>
+body { margin: 0; background: #fff; }
+.page { width: 794px; box-sizing: border-box; font: 13px Helvetica, Arial, sans-serif; color: #1d2733; }
+.band { background: #1f4e79; color: #fff; padding: 28px 40px; }
+.band .name { font-size: 22px; font-weight: bold; }
+.band small { color: #cfe0f1; }
+.body { padding: 30px 40px; }
+.grid { display: flex; justify-content: space-between; margin-bottom: 28px; }
+.label { color: #1f4e79; font-weight: bold; text-transform: uppercase; font-size: 11px; }
+table { width: 100%; border-collapse: collapse; }
+th { background: #1f4e79; color: #fff; padding: 8px; text-align: left; }
+td { padding: 8px; }
+tr:nth-child(even) td { background: #eef3f8; }
+.r { text-align: right; }
+.sum { margin: 24px 0 0 auto; width: 320px; background: #eef3f8; padding: 12px; }
+.sum div { display: flex; justify-content: space-between; padding: 3px 0; }
+.big { font-size: 17px; font-weight: bold; color: #1f4e79; }
+</style></head><body><div class="page">
+<div class="band"><div class="name">{{ inv.seller.name }}</div>
+<small>{{ inv.seller.address }}<br>SIRET : {{ inv.seller.siret }} | N° TVA : {{ inv.seller.vat_number }}</small></div>
+<div class="body">
+<div class="grid">
+  <div><div class="label">Facturé à</div>{{ inv.client.name }}<br>{% for l in d.client_lines %}{{ l }}<br>{% endfor %}</div>
+  <div class="r"><div class="label">Facture</div>{{ inv.invoice_number }}<br><div class="label">Date d'émission</div>{{ d.date.strftime("%d/%m/%Y") }}</div>
+</div>
+<table><tr><th>Description</th><th class="r">Quantité</th><th class="r">PU HT</th><th class="r">Montant HT</th></tr>
+{% for x in d.lines %}<tr><td>{{ x.description }}</td><td class="r">{{ x.quantity }}</td><td class="r">{{ x.unit|eur }}</td><td class="r">{{ x.amount|eur }}</td></tr>{% endfor %}
+</table>
+<div class="sum">
+<div><span>Sous-total HT</span><span>{{ d.total_ht|eur }}</span></div>
+<div><span>TVA ({{ d.rate|num }} %)</span><span>{{ d.vat|eur }}</span></div>
+<div class="big"><span>Total TTC</span><span>{{ d.total_ttc|eur }}</span></div>
+</div>
+<p style="margin-top:30px;font-size:11px">Contact : {{ d.email }} - Règlement sous {{ d.due_days }} jours.</p>
+</div></div></body></html>

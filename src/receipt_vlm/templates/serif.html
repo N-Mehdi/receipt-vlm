@@ -1,0 +1,28 @@
+<html><head><meta charset="utf-8"><style>
+body { margin: 0; background: #fffdf7; }
+.page { width: 794px; padding: 50px; box-sizing: border-box; font: 14px Georgia, "Times New Roman", serif; color: #2b2118; background: #fffdf7; }
+h1 { text-align: center; font-weight: normal; letter-spacing: 6px; margin: 0 0 6px; }
+.sub { text-align: center; font-style: italic; margin-bottom: 30px; }
+.parties { display: flex; justify-content: space-between; margin-bottom: 30px; }
+table { width: 100%; border-collapse: collapse; }
+th { font-weight: normal; font-style: italic; border-bottom: 1px solid #2b2118; padding: 6px; text-align: left; }
+td { padding: 6px; }
+.r { text-align: right; }
+.totals { margin: 24px 0 0 auto; width: 330px; border-top: 1px solid #2b2118; }
+</style></head><body><div class="page">
+<h1>FACTURE</h1>
+<div class="sub">Numéro {{ inv.invoice_number }}, établie le {{ d.date|long_date }}</div>
+<div class="parties">
+  <div><i>Adressée à</i><br><b>{{ inv.client.name }}</b><br>{% for l in d.client_lines %}{{ l }}<br>{% endfor %}</div>
+  <div class="r"><b>{{ inv.seller.name }}</b><br>{% for l in d.seller_lines %}{{ l }}<br>{% endfor %}{{ d.email }}</div>
+</div>
+<table><tr><th>Désignation</th><th class="r">Prix unitaire HT</th><th class="r">Quantité</th><th class="r">Montant</th></tr>
+{% for x in d.lines %}<tr><td>{{ x.description }}</td><td class="r">{{ x.unit|eur }}</td><td class="r">{{ x.quantity }}</td><td class="r">{{ x.amount|eur }}</td></tr>{% endfor %}
+</table>
+<table class="totals">
+<tr><td>Total hors taxes</td><td class="r">{{ d.total_ht|eur }}</td></tr>
+<tr><td>TVA au taux de {{ d.rate|num }} %</td><td class="r">{{ d.vat|eur }}</td></tr>
+<tr><td><b>Net à payer</b></td><td class="r"><b>{{ d.total_ttc|eur }}</b></td></tr>
+</table>
+<p style="margin-top:40px;text-align:center;font-size:12px">{{ inv.seller.name }}, SIRET {{ inv.seller.siret }}, numéro de TVA {{ inv.seller.vat_number }}</p>
+</div></body></html>
