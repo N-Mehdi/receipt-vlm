@@ -54,7 +54,7 @@ Training: one epoch on 800 CORD receipts and 1000 invoices, 4-bit NF4 base, fp16
 - Adapter: [N-Mehdi/qwen3-vl-2b-receipts-lora](https://huggingface.co/N-Mehdi/qwen3-vl-2b-receipts-lora)
 - Invoice dataset: [N-Mehdi/french-invoices-synth](https://huggingface.co/datasets/N-Mehdi/french-invoices-synth)
 - Demo: [N-Mehdi/receipt-vlm](https://huggingface.co/spaces/N-Mehdi/receipt-vlm), results and
-  examples precomputed on a T4. The live Gradio demo in [app/app.py](app/app.py) runs locally.
+  examples precomputed on a T4. The live demo runs locally at `/demo` (see below).
 
 ## Usage
 
@@ -65,13 +65,18 @@ python scripts/evaluate.py --dataset cord --adapter N-Mehdi/qwen3-vl-2b-receipts
 python scripts/train.py --invoice-source data/invoices --hub-repo <user>/<repo>
 ```
 
-API and live demo (CPU, the base model and the adapter are downloaded on first use):
+API and live demo, served together (CPU, the model is downloaded on the first request):
 
 ```bash
 docker build -t receipt-vlm-api .
 docker run -p 8000:8000 receipt-vlm-api
-curl -F file=@invoice.jpg "localhost:8000/extract?kind=invoice"   # kind: invoice or cord
-pip install -r app/requirements.txt && pip install -e . && python -m app.app   # Gradio demo
+# or without Docker:
+# pip install -r app/requirements.txt && pip install -e . && uvicorn app.api:app --port 8000
 ```
+
+- <http://localhost:8000> opens the API documentation, where `/extract` can be tried.
+- <http://localhost:8000/demo> opens the Gradio demo, with four precomputed examples.
+- From the command line: `curl -F file=@invoice.jpg "localhost:8000/extract?kind=invoice"`
+  (`kind` is `invoice` or `cord`).
 
 The Kaggle notebooks in [notebooks/](notebooks/) clone this repo and run the same scripts.
