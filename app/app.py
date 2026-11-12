@@ -12,9 +12,10 @@ INTRO = """# receipt-vlm
 Qwen3-VL-2B fine-tuned with QLoRA to extract French invoices and receipts (CORD) as JSON.
 Training invoices are synthetic: results on real documents are not measured.
 
-**Latency.** On a T4 GPU: about 6 s per receipt and 14 s per invoice. On CPU it is much
-slower: one to three minutes per document, plus a few minutes to load the model on the
-first request. The examples below show results precomputed on a T4 and load instantly."""
+**Latency.** On a T4 GPU: about 6 s per receipt and 14 s per invoice. On a laptop CPU with
+transformers: one to three minutes per document, plus a few minutes to load the model on the
+first request. With llama.cpp (Q8_0 GGUF): about 50 s per invoice and 60 s per receipt.
+The examples below show results precomputed on a T4 and load instantly."""
 
 
 def run(image, kind):

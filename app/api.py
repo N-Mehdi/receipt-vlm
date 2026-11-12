@@ -2,6 +2,7 @@
 
 import io
 from typing import Annotated
+from urllib.error import URLError
 
 import gradio as gr
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
@@ -9,7 +10,7 @@ from fastapi.responses import RedirectResponse
 from PIL import Image, UnidentifiedImageError
 
 from app.app import demo
-from receipt_vlm.service import KINDS, extract
+from receipt_vlm.service import BACKEND, KINDS, extract
 
 api = FastAPI(
     title="receipt-vlm",
@@ -24,7 +25,7 @@ def root():
 
 @api.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok", "backend": BACKEND}
 
 
 @api.post("/extract")
@@ -39,7 +40,10 @@ def extract_endpoint(
         image.load()
     except UnidentifiedImageError as error:
         raise HTTPException(400, "the file is not a readable image") from error
-    return extract(image, kind)
+    try:
+        return extract(image, kind)
+    except URLError as error:
+        raise HTTPException(503, "llama-server is not reachable") from error
 
 
 app = gr.mount_gradio_app(api, demo, path="/demo")
