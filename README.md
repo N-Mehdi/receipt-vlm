@@ -47,11 +47,13 @@ Training: one epoch on 800 CORD receipts and 1000 invoices, 4-bit NF4 base, fp16
   Scores on real scans, handwriting, multi-page or multi-rate VAT invoices are unknown.
 - "Unseen templates" only changes the layout; the text distribution comes from the same generator.
 - CORD fields that are rare in training (sub-items, `itemsubtotal`, `etc`) are still missed.
-- On CPU the live demo takes one to three minutes per document.
+- On a laptop CPU, a document takes one to three minutes with transformers and 40 to 85 s
+  with llama.cpp (see [CPU inference with llama.cpp](#cpu-inference-with-llamacpp)).
 
 ## Links
 
 - Adapter: [N-Mehdi/qwen3-vl-2b-receipts-lora](https://huggingface.co/N-Mehdi/qwen3-vl-2b-receipts-lora)
+- GGUF files for llama.cpp: [N-Mehdi/qwen3-vl-2b-receipts-gguf](https://huggingface.co/N-Mehdi/qwen3-vl-2b-receipts-gguf)
 - Invoice dataset: [N-Mehdi/french-invoices-synth](https://huggingface.co/datasets/N-Mehdi/french-invoices-synth)
 - Demo: [N-Mehdi/receipt-vlm](https://huggingface.co/spaces/N-Mehdi/receipt-vlm), results and
   examples precomputed on a T4. The live demo runs locally at `/demo` (see below).
@@ -80,3 +82,62 @@ docker run -p 8000:8000 receipt-vlm-api
   (`kind` is `invoice` or `cord`).
 
 The Kaggle notebooks in [notebooks/](notebooks/) clone this repo and run the same scripts.
+
+## CPU inference with llama.cpp
+
+The adapter is merged into the base model in fp16 and converted to GGUF: language model in Q8_0
+and Q4_K_M, vision projector (`mmproj`) in f16. Same prompts, parsing and metrics as above,
+100 test documents per set for quality, batch size 1 and 20 documents per set for latency.
+
+Machine: Intel Core i7-1365U laptop (2 performance and 8 efficiency cores, AVX2), balanced
+power profile. llama.cpp b12282 uses 4 threads for generation and 12 for prompt processing
+(10 threads made generation twice slower on this hybrid CPU); transformers runs in fp32 with
+10 threads. Quality for transformers is the fp16 reference above. Tokens/s counts generated
+tokens over the total time.
+
+| Test set | Model | Exact match | Field F1 | Mean | p50 | p95 | Tokens/s |
+|---|---|---|---|---|---|---|---|
+| Invoices | transformers | 0.63 | 0.979 | 180 s | 171 s | 249 s | 1.6 |
+| | Q8_0 (1.8 GB) | 0.62 | 0.980 | 50 s | 49 s | 66 s | 6.0 |
+| | Q4_K_M (1.1 GB) | 0.50 | 0.969 | 43 s | 43 s | 57 s | 6.8 |
+| CORD | transformers | 0.35 | 0.832 | 100 s | 102 s | 146 s | 1.0 |
+| | Q8_0 | 0.35 | 0.825 | 60 s | 73 s | 83 s | 1.8 |
+| | Q4_K_M | 0.23 | 0.807 | 54 s | 66 s | 75 s | 2.0 |
+
+All variants return valid JSON for 99 to 100% of documents and truncate none.
+
+- **Q8_0 keeps the fp16 quality** and is 3.6 times faster than transformers on invoices.
+  It is the default.
+- **Q4_K_M** saves about 12% of the time but loses 12 points of exact match on both sets,
+  mostly on long strings to copy exactly (addresses, SIRET and VAT numbers).
+- **Receipts gain less (1.7 times)** because prompt processing dominates, not generation.
+  CORD photos use 838 visual tokens on average (60 of 100 reach the 1024 cap) against 445 for
+  invoices, and prompt processing including the vision encoder takes 56 s per receipt against
+  28 s per invoice. On this 15 W CPU it is compute bound: quantizing the language model or
+  adding threads barely changes it, while generation alone reaches 12 tokens/s with Q8_0.
+
+Serve the API with llama-server (the API loads no model and calls the server):
+
+```bash
+hf download N-Mehdi/qwen3-vl-2b-receipts-gguf --local-dir models/gguf
+docker compose up                # Q8_0
+QUANT=Q4_K_M docker compose up   # smaller and less accurate
+```
+
+`THREADS` and `THREADS_BATCH` set the llama.cpp threads (defaults: 4 and 12, the values measured
+above); use the number of physical cores on other machines. Without Docker, set
+`BACKEND=llamacpp` and `LLAMACPP_URL` for the API.
+
+Rebuild the GGUF files and rerun the evaluation:
+
+```bash
+python scripts/merge_adapter.py   # models/merged, fp16
+scripts/convert_gguf.sh           # models/gguf, with the official llama.cpp image
+docker run -p 8080:8080 -v $PWD/models/gguf:/models ghcr.io/ggml-org/llama.cpp:server-b12282 \
+    -m /models/qwen3-vl-2b-receipts-Q8_0.gguf --mmproj /models/mmproj-qwen3-vl-2b-receipts-f16.gguf \
+    --host 0.0.0.0 -c 4096 -np 1 --image-min-tokens 64 --image-max-tokens 1024 -t 4 -tb 12 \
+    --no-cache-prompt
+python scripts/evaluate.py --backend llamacpp --dataset cord --latency-docs 20 --out outputs/cpu/Q8_0-cord.json
+```
+
+`--no-cache-prompt` keeps the latency honest when the same documents are sent twice.
