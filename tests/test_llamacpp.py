@@ -35,3 +35,13 @@ def test_length_stop_is_truncation(monkeypatch):
     monkeypatch.setattr(llamacpp, "call", fake_server([], "length"))
     doc = {"image": Image.new("RGB", (64, 64)), "kind": "invoice"}
     assert llamacpp.generate([doc])[0]["truncated"]
+
+
+def test_service_calls_llama_server(monkeypatch):
+    from receipt_vlm import service
+
+    monkeypatch.setattr(service, "BACKEND", "llamacpp")
+    monkeypatch.setattr(llamacpp, "call", fake_server([], "stop"))
+    result = service.extract(Image.new("RGB", (64, 64)), "cord")
+    assert result["data"] == {"total": {"total_price": "10"}}
+    assert not result["truncated"]
